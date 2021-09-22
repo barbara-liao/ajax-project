@@ -1,0 +1,8 @@
+.row {
+  display: flex;
+  flex-direction: wrap;
+}
+
+.column-half {
+  flex-basis: 50%;
+}
