@@ -1,8 +1,17 @@
 .row {
   display: flex;
-  flex-direction: wrap;
 }
 
 .column-half {
   flex-basis: 50%;
+}
+
+.column-one-third {
+  flex-basis: calc(100% / 3);
+  display: flex;
+}
+
+.column-two-thirds {
+  flex-basis: calc(200% / 3);
+  padding: 15px 15px 15px 3rem;
 }

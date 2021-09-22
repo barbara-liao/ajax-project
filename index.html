@@ -14,32 +14,39 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Shadows+Into+Light&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <div class="header-container">
-      <div class="row">
-        <div class="column-half flex justify-between align-center header-margin">
-          <p class="header">Bookopedia</p>
-          <div class="header-icon flex">
-            <i class="fas fa-search"></i>
-            <i class="fas fa-book-open"></i>
-          </div>
+  <header class="header-container">
+    <div class="fixed-container">
+      <div class="row justify-between align-center header-margin-padding">
+        <p class="header">Bookopedia</p>
+        <div class="flex">
+          <button id="nav-search-button" data-view="search-page" class="nav-button"><i data-view="search-page" class="fas fa-search"></i></button>
+          <button id="nav-bookmarks" data-view="bookmark-page" class="nav-button"><i class="fas fa-book-open"></i></button>
         </div>
       </div>
     </div>
   </header>
   <main>
-    <div class="container">
-      <form id="search-form" data-view="search-page" class="">
+    <div data-view="search-page" class="container">
+      <form id="search-form">
         <div class="column-half margin-auto">
           <div class="row align-center justify-center search-margin">
             <img class="search-img" src="images/AJAX-Background.svg">
             <div class="search-bar-container flex justify-center">
               <input required class="search-bar" name="search" type="text" placeholder="Search for title or author">
-              <button id="search-button" class="flex align-center search-icon" type="submit"><i class="fas fa-search"></i></button>
+              <button data-view="search-results" id="search-button" class="flex align-center search-icon" type="submit"><i data-view="search-results" class="fas fa-search"></i></button>
             </div>
           </div>
         </div>
       </form>
+    </div>
+    <div data-view="search-results" class="container hidden">
+      <div class="column-half results-margin">
+        <div class="row">
+          <h2 id="update-result-search">Search Results for "The Martian"</h2>
+        </div>
+        <ul>
+        </ul>
+      </div>
     </div>
   </main>
   <script src="js/data.js"></script>
