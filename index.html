@@ -26,6 +26,19 @@
     </div>
   </header>
   <main>
+    <div class="modal-overlay hidden">
+      <div class="modal flex-column">
+        <div class="row justify-end">
+          <button class="close-modal"><i id="close-modal" class="fas fa-times margin-zero"></i></button>
+        </div>
+        <div class="row align-center margin-zero-auto">
+          <h2>Added to Bookmarks</h2>
+        </div>
+        <div class="row align-center bookmark-button-margin">
+          <button class="go-to-bookmark" data-view="bookmark-page">Go to Bookmarks</button>
+        </div>
+      </div>
+    </div>
     <div data-view="search-page" class="container">
       <form id="search-form">
         <div class="column-half margin-auto">
