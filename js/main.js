@@ -6,13 +6,17 @@ var $searchButton = document.querySelector('#search-button');
 var $navSearchButton = document.querySelector('#nav-search-button');
 var $detailPageContainer = document.querySelector('#detail-page-container');
 var $back = document.querySelector('#back-to-results');
+var $modal = document.querySelector('.modal-overlay');
+var $closeModal = document.querySelector('#close-modal');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
 $navSearchButton.addEventListener('click', dataView);
 window.addEventListener('DOMContentLoaded', handleLoad);
 $ul.addEventListener('click', handleDetail);
+$ul.addEventListener('click', handleAdd);
 $back.addEventListener('click', dataView);
+$closeModal.addEventListener('click', closeModal);
 
 function handleLoad(event) {
   for (var i = 0; i < data.results.length; i++) {
@@ -105,9 +109,25 @@ function renderResults(result) {
   $colTwoThird.appendChild($rowAdd);
   $rowAdd.className = 'row justify-end';
 
+  var $addBookmarkButton = document.createElement('button');
+  $rowAdd.appendChild($addBookmarkButton);
+  $addBookmarkButton.className = 'card-bookmark-button';
+
   var $plus = document.createElement('i');
-  $rowAdd.appendChild($plus);
-  $plus.className = 'fas fa-plus';
+  $addBookmarkButton.appendChild($plus);
+  if (data.bookmarks.length === 0) {
+    $plus.className = 'fas fa-plus margin-zero';
+  } else {
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      if (data.bookmarks[b].id === result.id) {
+        $plus.className = 'fas fa-minus margin-zero';
+      } else {
+        $plus.className = 'fas fa-plus margin-zero';
+      }
+    }
+  }
+  $plus.setAttribute('id', 'add-to-bookmarks');
+  $plus.setAttribute('result-id', data.nextResultId);
 
   var $rowTitle = document.createElement('div');
   $colTwoThird.appendChild($rowTitle);
@@ -255,14 +275,13 @@ function renderDetail(result) {
 }
 
 function handleDetail(event) {
-  var $previousRender = document.querySelectorAll('#detail-page-render');
-
-  for (var d = 0; d < $previousRender.length; d++) {
-    $previousRender[d].remove();
-  }
-
   var $dataView = event.target.getAttribute('data-view');
   if (event.target.nodeName === 'BUTTON' && $dataView !== '') {
+    var $previousRender = document.querySelectorAll('#detail-page-render');
+
+    for (var d = 0; d < $previousRender.length; d++) {
+      $previousRender[d].remove();
+    }
     viewSwap($dataView);
   }
 
@@ -272,6 +291,25 @@ function handleDetail(event) {
   $detailPageContainer.appendChild(render);
   data.detail = data.results[$resultId];
 
+}
+
+function handleAdd(event) {
+  var $id = event.target.getAttribute('id');
+  if (event.target.className === 'fas fa-plus margin-zero' && $id === 'add-to-bookmarks') {
+    var $resultId = event.target.getAttribute('result-id');
+
+    $modal.className = 'modal-overlay';
+    event.target.className = 'fas fa-minus margin-zero';
+
+    data.bookmarks.push(data.results[$resultId]);
+  }
+}
+
+function closeModal(event) {
+  var $id = event.target.getAttribute('id');
+  if (event.target.nodeName === 'I' && $id === 'close-modal') {
+    $modal.className = 'modal-overlay hidden';
+  }
 }
 
 function dataView(event) {
