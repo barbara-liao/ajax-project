@@ -8,6 +8,8 @@ var $detailPageContainer = document.querySelector('#detail-page-container');
 var $back = document.querySelector('#back-to-results');
 var $modal = document.querySelector('.modal-overlay');
 var $closeModal = document.querySelector('#close-modal');
+var $bookmarkButtonNav = document.querySelector('#nav-bookmarks');
+var $bookmarkButtonModal = document.querySelector('.go-to-bookmark');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
@@ -17,18 +19,28 @@ $ul.addEventListener('click', handleDetail);
 $ul.addEventListener('click', handleAdd);
 $back.addEventListener('click', dataView);
 $closeModal.addEventListener('click', closeModal);
+$bookmarkButtonNav.addEventListener('click', handleBookmarks);
+$bookmarkButtonModal.addEventListener('click', handleBookmarks);
 
 function handleLoad(event) {
-  for (var i = 0; i < data.results.length; i++) {
-    var render = renderResults(data.results[i]);
-    $ul.appendChild(render);
+  viewSwap(data.view);
+
+  if (data.searchPageView === 'Bookmarks') {
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      var renderBookmarks = renderResults(data.bookmarks[b]);
+      $ul.appendChild(renderBookmarks);
+    }
+    $searchResultTitle.textContent = 'Bookmarks';
+  } else {
+    for (var i = 0; i < data.results.length; i++) {
+      var render = renderResults(data.results[i]);
+      $ul.appendChild(render);
+    }
+    $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
   }
-  $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
 
   var renderPreviousDetail = renderDetail(data.detail);
   $detailPageContainer.appendChild(renderPreviousDetail);
-
-  viewSwap(data.view);
 }
 
 function handleSubmit(event) {
@@ -76,6 +88,7 @@ function handleSubmit(event) {
   $searchResultTitle.textContent = 'Search Results for ' + '"' + $searchForm.elements.search.value + '"';
   data.search = $searchForm.elements.search.value;
 
+  data.searchPageView = 'Search Results';
   $searchForm.reset();
   newSearch.send();
 }
@@ -119,8 +132,9 @@ function renderResults(result) {
     $plus.className = 'fas fa-plus margin-zero';
   } else {
     for (var b = 0; b < data.bookmarks.length; b++) {
-      if (data.bookmarks[b].id === result.id) {
+      if (result.id === data.bookmarks[b].id) {
         $plus.className = 'fas fa-minus margin-zero';
+        break;
       } else {
         $plus.className = 'fas fa-plus margin-zero';
       }
@@ -310,6 +324,27 @@ function closeModal(event) {
   if (event.target.nodeName === 'I' && $id === 'close-modal') {
     $modal.className = 'modal-overlay hidden';
   }
+}
+
+function handleBookmarks(event) {
+  $modal.className = 'modal-overlay hidden';
+  viewSwap('search-results');
+  $searchResultTitle.textContent = 'Bookmarks';
+
+  var $liList = document.querySelectorAll('li');
+
+  for (var i = 0; i < $liList.length; i++) {
+    $liList[i].remove();
+  }
+
+  for (var b = 0; b < data.bookmarks.length; b++) {
+    var render = renderResults(data.bookmarks[b]);
+    $ul.appendChild(render);
+  }
+
+  data.nextResultId = 0;
+  viewSwap('search-results');
+  data.searchPageView = 'Bookmarks';
 }
 
 function dataView(event) {
