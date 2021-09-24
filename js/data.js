@@ -5,7 +5,8 @@ var data = {
   results: [],
   detail: null,
   nextResultId: 0,
-  view: ''
+  view: '',
+  searchPageView: ''
 };
 
 var previousResultsJSON = localStorage.getItem('results-list');
