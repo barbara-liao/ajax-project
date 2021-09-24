@@ -126,7 +126,7 @@ function renderResults(result) {
       }
     }
   }
-  $plus.setAttribute('name', 'add-to-bookmarks');
+  $plus.classList.add('add-to-bookmarks');
   $plus.setAttribute('result-id', data.nextResultId);
 
   var $rowTitle = document.createElement('div');
@@ -294,8 +294,8 @@ function handleDetail(event) {
 }
 
 function handleAdd(event) {
-  var $name = event.target.getAttribute('name');
-  if (event.target.className === 'fas fa-plus margin-zero' && $name === 'add-to-bookmarks') {
+  var $class = event.target.getAttribute('class');
+  if (event.target.className === 'fas fa-plus margin-zero add-to-bookmarks' && $class.includes('add-to-bookmarks')) {
     var $resultId = event.target.getAttribute('result-id');
 
     $modal.className = 'modal-overlay';
