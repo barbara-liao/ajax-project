@@ -89,6 +89,14 @@ body {
   margin: 0 15px;
 }
 
+.back-margin {
+  margin: 1rem 0 0 15px;
+}
+
+.genre-margin {
+  margin: 0 0 10px 0;
+}
+
 .search-margin {
   margin: 3rem 3rem 0 3rem;
 }
@@ -105,6 +113,10 @@ body {
 
 .margin-auto {
   margin: auto;
+}
+
+.detail-margin {
+  margin: 0 30px;
 }
 
 .flex-column {
@@ -126,19 +138,71 @@ body {
   font-size: 0.9rem;
 }
 
+.column-height {
+  height: 250px;
+}
+
 .margin-top-auto {
   margin-top: auto;
+}
+
+.margin-zero {
+  margin: 0;
+}
+
+.margin-side {
+  margin: 8px 8px 9px 0;
+}
+
+.genre-color {
+  color: #7e7e7e;
+}
+
+.star-size {
+  font-size: 1.3rem;
+}
+
+.reviews {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+}
+
+.summary-size {
+  font-size: 0.95rem;
+}
+
+.padding-zero {
+  padding: 0;
 }
 
 .detail-button {
   font-size: 1rem;
   background-color: #7e7e7e;
   color: white;
-  padding: 0.5rem 3.8rem;
+  padding: 0.5rem 4rem;
   border-radius: 4px;
   margin: auto 0 0 0;
   text-decoration: none;
   border: none;
+}
+
+.bookmark-button {
+  font-size: 1rem;
+  background-color: #7e7e7e;
+  color: white;
+  width: 13rem;
+  height: 2.5rem;
+  border-radius: 4px;
+  margin: auto 0 0 0;
+  text-decoration: none;
+  border: none;
+}
+
+.back-button {
+  background-color: transparent;
+  font-size: 1.2rem;
+  border: none;
+  padding: none;
 }
 
 ul {

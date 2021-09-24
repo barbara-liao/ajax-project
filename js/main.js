@@ -4,11 +4,15 @@ var $searchResultTitle = document.querySelector('#update-result-search');
 var $container = document.querySelectorAll('.container');
 var $searchButton = document.querySelector('#search-button');
 var $navSearchButton = document.querySelector('#nav-search-button');
+var $detailPageContainer = document.querySelector('#detail-page-container');
+var $back = document.querySelector('#back-to-results');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
 $navSearchButton.addEventListener('click', dataView);
 window.addEventListener('DOMContentLoaded', handleLoad);
+$ul.addEventListener('click', handleDetail);
+$back.addEventListener('click', dataView);
 
 function handleLoad(event) {
   for (var i = 0; i < data.results.length; i++) {
@@ -16,6 +20,10 @@ function handleLoad(event) {
     $ul.appendChild(render);
   }
   $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
+
+  var renderPreviousDetail = renderDetail(data.detail);
+  $detailPageContainer.appendChild(renderPreviousDetail);
+
   viewSwap(data.view);
 }
 
@@ -23,12 +31,14 @@ function handleSubmit(event) {
   event.preventDefault();
   var keywords = [];
   var tempOutput = '';
+
   var $liList = document.querySelectorAll('li');
 
   for (var d = 0; d < $liList.length; d++) {
     $liList[d].remove();
   }
 
+  data.nextResultId = 0;
   data.results = [];
 
   for (var i = 0; i < $searchForm.elements.search.value.length; i++) {
@@ -55,6 +65,7 @@ function handleSubmit(event) {
       data.results.push(this.response.items[a]);
       var render = renderResults(this.response.items[a]);
       $ul.appendChild(render);
+      data.nextResultId++;
     }
   });
 
@@ -67,6 +78,7 @@ function handleSubmit(event) {
 
 function renderResults(result) {
   var $li = document.createElement('li');
+  $li.setAttribute('result-id', data.nextResultId);
 
   var $card = document.createElement('div');
   $li.appendChild($card);
@@ -127,10 +139,139 @@ function renderResults(result) {
   $rowDetails.appendChild($detailButton);
   $detailButton.textContent = 'Details';
   $detailButton.className = 'detail-button';
-  $detailButton.setAttribute('data-view', 'detail-view');
+  $detailButton.setAttribute('data-view', 'detail-page');
   $detailButton.setAttribute('id', 'details');
+  $detailButton.setAttribute('result-id', data.nextResultId);
 
   return $li;
+}
+
+function renderDetail(result) {
+  var $detailPageRender = document.createElement('div');
+  $detailPageRender.setAttribute('id', 'detail-page-render');
+
+  var $titleRow = document.createElement('div');
+  $detailPageRender.appendChild($titleRow);
+  $titleRow.className = 'row results-margin';
+
+  var $title = document.createElement('h1');
+  $titleRow.appendChild($title);
+  $title.textContent = result.volumeInfo.title;
+
+  var $detailRow = document.createElement('div');
+  $detailPageRender.appendChild($detailRow);
+  $detailRow.className = 'row detail-margin';
+
+  var $colOneThird = document.createElement('div');
+  $detailRow.appendChild($colOneThird);
+  $colOneThird.className = 'column-one-third column-height flex justify-center align-center';
+
+  var $image = document.createElement('img');
+  $colOneThird.appendChild($image);
+  $image.className = 'image-width';
+  if ('imageLinks' in result.volumeInfo) {
+    $image.setAttribute('src', result.volumeInfo.imageLinks.thumbnail);
+  } else {
+    $image.setAttribute('src', 'images/placeholder-image-square.jpg');
+  }
+
+  var $colTwoThird = document.createElement('div');
+  $detailRow.appendChild($colTwoThird);
+  $colTwoThird.className = 'column-two-thirds flex-column';
+
+  var $genreRow = document.createElement('div');
+  $colTwoThird.appendChild($genreRow);
+  $genreRow.className = 'row genre-margin';
+
+  var $genre = document.createElement('p');
+  $genreRow.appendChild($genre);
+  $genre.className = 'margin-zero genre-color';
+  if ('categories' in result.volumeInfo) {
+    $genre.textContent = result.volumeInfo.categories[0];
+  }
+
+  var $authorRow = document.createElement('div');
+  $colTwoThird.appendChild($authorRow);
+  $authorRow.className = 'row flex-column';
+
+  if ('authors' in result.volumeInfo) {
+    for (var i = 0; i < result.volumeInfo.authors.length; i++) {
+      var $author = document.createElement('p');
+      $authorRow.appendChild($author);
+      $author.className = 'margin-zero';
+      $author.textContent = result.volumeInfo.authors[i];
+    }
+  }
+
+  var $starReviewBookmarkRow = document.createElement('div');
+  $colTwoThird.appendChild($starReviewBookmarkRow);
+  $starReviewBookmarkRow.className = 'margin-top-auto';
+
+  var $ratings = document.createElement('div');
+  $starReviewBookmarkRow.appendChild($ratings);
+  $ratings.className = 'row star-size';
+
+  for (var r = 0; r < result.volumeInfo.averageRating; r++) {
+    var $filledStar = document.createElement('i');
+    $filledStar.className = 'margin-zero fas fa-star';
+    $ratings.appendChild($filledStar);
+  }
+
+  for (var f = 0; f < 5 - result.volumeInfo.averageRating; f++) {
+    var $emptyStar = document.createElement('i');
+    $emptyStar.className = 'margin-zero far fa-star';
+    $ratings.appendChild($emptyStar);
+  }
+
+  var $reviewsRow = document.createElement('div');
+  $starReviewBookmarkRow.appendChild($reviewsRow);
+  $reviewsRow.className = 'row';
+
+  var $reviews = document.createElement('p');
+  $reviewsRow.appendChild($reviews);
+  $reviews.className = 'reviews';
+  if ('ratingsCount' in result.volumeInfo) {
+    $reviews.textContent = result.volumeInfo.ratingsCount + ' Reviews';
+  }
+
+  var $buttonRow = document.createElement('div');
+  $starReviewBookmarkRow.appendChild($buttonRow);
+  $buttonRow.className = 'row';
+
+  var $button = document.createElement('button');
+  $buttonRow.appendChild($button);
+  $button.className = 'bookmark-button';
+  $button.textContent = 'Remove from Bookmarks';
+
+  var $summaryRow = document.createElement('div');
+  $detailPageRender.appendChild($summaryRow);
+  $summaryRow.className = 'row detail-margin summary-size';
+
+  var $summary = document.createElement('p');
+  $summaryRow.appendChild($summary);
+  $summary.textContent = result.volumeInfo.description;
+
+  return $detailPageRender;
+}
+
+function handleDetail(event) {
+  var $previousRender = document.querySelectorAll('#detail-page-render');
+
+  for (var d = 0; d < $previousRender.length; d++) {
+    $previousRender[d].remove();
+  }
+
+  var $dataView = event.target.getAttribute('data-view');
+  if (event.target.nodeName === 'BUTTON' && $dataView !== '') {
+    viewSwap($dataView);
+  }
+
+  var $resultId = event.target.getAttribute('result-id');
+
+  var render = renderDetail(data.results[$resultId]);
+  $detailPageContainer.appendChild(render);
+  data.detail = data.results[$resultId];
+
 }
 
 function dataView(event) {

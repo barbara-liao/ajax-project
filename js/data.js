@@ -4,8 +4,8 @@ var data = {
   bookmarks: [],
   results: [],
   detail: null,
-  view: '',
-  search: ''
+  nextResultId: 0,
+  view: ''
 };
 
 var previousResultsJSON = localStorage.getItem('results-list');
