@@ -10,33 +10,46 @@ var $modal = document.querySelector('.modal-overlay');
 var $closeModal = document.querySelector('#close-modal');
 var $bookmarkButtonNav = document.querySelector('#nav-bookmarks');
 var $bookmarkButtonModal = document.querySelector('.go-to-bookmark');
+var $confirmMessage = document.querySelector('.confirm-message');
+var $bookmarkMessage = document.querySelector('.bookmark-message');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
 $navSearchButton.addEventListener('click', dataView);
 window.addEventListener('DOMContentLoaded', handleLoad);
 $ul.addEventListener('click', handleDetail);
-$ul.addEventListener('click', handleAdd);
+$ul.addEventListener('click', handleAddAndRemove);
 $back.addEventListener('click', dataView);
 $closeModal.addEventListener('click', closeModal);
 $bookmarkButtonNav.addEventListener('click', handleBookmarks);
 $bookmarkButtonModal.addEventListener('click', handleBookmarks);
+$bookmarkButtonModal.addEventListener('click', confirmRemove);
+$detailPageContainer.addEventListener('click', handleAddAndRemove);
 
 function handleLoad(event) {
   viewSwap(data.view);
+  data.nextResultId = 0;
 
   if (data.searchPageView === 'Bookmarks') {
     for (var b = 0; b < data.bookmarks.length; b++) {
       var renderBookmarks = renderResults(data.bookmarks[b]);
+      data.nextResultId++;
       $ul.appendChild(renderBookmarks);
     }
     $searchResultTitle.textContent = 'Bookmarks';
   } else {
     for (var i = 0; i < data.results.length; i++) {
       var render = renderResults(data.results[i]);
+      data.nextResultId++;
       $ul.appendChild(render);
     }
     $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
+  }
+
+  if (data.bookmarks.length === 0) {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
+  } else {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
 
   var renderPreviousDetail = renderDetail(data.detail);
@@ -47,6 +60,8 @@ function handleSubmit(event) {
   event.preventDefault();
   var keywords = [];
   var tempOutput = '';
+
+  $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
 
   var $liList = document.querySelectorAll('li');
 
@@ -95,7 +110,7 @@ function handleSubmit(event) {
 
 function renderResults(result) {
   var $li = document.createElement('li');
-  $li.setAttribute('result-id', data.nextResultId);
+  $li.setAttribute('data-id', data.nextResultId);
 
   var $card = document.createElement('div');
   $li.appendChild($card);
@@ -140,8 +155,7 @@ function renderResults(result) {
       }
     }
   }
-  $plus.classList.add('add-to-bookmarks');
-  $plus.setAttribute('result-id', data.nextResultId);
+  $plus.setAttribute('data-id', data.nextResultId);
 
   var $rowTitle = document.createElement('div');
   $colTwoThird.appendChild($rowTitle);
@@ -175,7 +189,7 @@ function renderResults(result) {
   $detailButton.className = 'detail-button';
   $detailButton.setAttribute('data-view', 'detail-page');
   $detailButton.setAttribute('id', 'details');
-  $detailButton.setAttribute('result-id', data.nextResultId);
+  $detailButton.setAttribute('data-id', data.nextResultId);
 
   return $li;
 }
@@ -274,8 +288,19 @@ function renderDetail(result) {
 
   var $button = document.createElement('button');
   $buttonRow.appendChild($button);
-  $button.className = 'bookmark-button';
-  $button.textContent = 'Remove from Bookmarks';
+  $button.className = 'detail-bookmark-button';
+  if (data.bookmarks.length === 0) {
+    $button.textContent = 'Add to Bookmarks';
+  } else {
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      if (result.id === data.bookmarks[b].id) {
+        $button.textContent = 'Remove from Bookmarks';
+        break;
+      } else {
+        $button.textContent = 'Add to Bookmarks';
+      }
+    }
+  }
 
   var $summaryRow = document.createElement('div');
   $detailPageRender.appendChild($summaryRow);
@@ -290,32 +315,69 @@ function renderDetail(result) {
 
 function handleDetail(event) {
   var $dataView = event.target.getAttribute('data-view');
+
   if (event.target.nodeName === 'BUTTON' && $dataView !== '') {
     var $previousRender = document.querySelectorAll('#detail-page-render');
-
     for (var d = 0; d < $previousRender.length; d++) {
       $previousRender[d].remove();
     }
     viewSwap($dataView);
   }
 
-  var $resultId = event.target.getAttribute('result-id');
+  var $resultId = event.target.getAttribute('data-id');
 
-  var render = renderDetail(data.results[$resultId]);
-  $detailPageContainer.appendChild(render);
-  data.detail = data.results[$resultId];
-
+  if (data.searchPageView === 'Bookmarks') {
+    var renderBookmarks = renderDetail(data.bookmarks[$resultId]);
+    $detailPageContainer.appendChild(renderBookmarks);
+    data.detail = data.bookmarks[$resultId];
+    data.detailId = parseInt($resultId);
+  } else {
+    var render = renderDetail(data.results[$resultId]);
+    $detailPageContainer.appendChild(render);
+    data.detail = data.results[$resultId];
+    data.detailId = parseInt($resultId);
+  }
 }
 
-function handleAdd(event) {
-  var $class = event.target.getAttribute('class');
-  if (event.target.className === 'fas fa-plus margin-zero add-to-bookmarks' && $class.includes('add-to-bookmarks')) {
-    var $resultId = event.target.getAttribute('result-id');
+function handleAddAndRemove(event) {
+  if (event.target.nodeName === 'BUTTON' && event.target.textContent === 'Add to Bookmarks') {
+    $confirmMessage.textContent = 'Added to Bookmarks';
+    $bookmarkButtonModal.textContent = 'Go to Bookmarks';
+    $modal.className = 'modal-overlay';
+    data.bookmarks.push(data.results[parseInt(data.detailId)]);
+  } else if (event.target.nodeName === 'BUTTON' && event.target.textContent === 'Remove from Bookmarks') {
+    $modal.className = 'modal-overlay';
+    $confirmMessage.textContent = 'Remove from Bookmarks?';
+    $bookmarkButtonModal.textContent = 'Remove';
+  }
 
+  if (event.target.className === 'fas fa-plus margin-zero') {
+    var $resultId = event.target.getAttribute('data-id');
+    $confirmMessage.textContent = 'Added to Bookmark';
+    $bookmarkButtonModal.textContent = 'Go to Bookmarks';
     $modal.className = 'modal-overlay';
     event.target.className = 'fas fa-minus margin-zero';
-
     data.bookmarks.push(data.results[$resultId]);
+  } else if (event.target.className === 'fas fa-minus margin-zero') {
+    $resultId = event.target.getAttribute('data-id');
+    $modal.className = 'modal-overlay';
+    $confirmMessage.textContent = 'Remove from Bookmarks?';
+    $bookmarkButtonModal.textContent = 'Remove';
+  }
+}
+
+function confirmRemove(event) {
+  if (event.target.textContent === 'Remove') {
+    data.bookmarks.splice(data.detailId, 1);
+    var $liList = document.querySelectorAll('li');
+    $liList[data.detailId].remove();
+    $modal.className = 'modal-overlay hidden';
+  }
+
+  if (data.bookmarks.length === 0) {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
+  } else {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
 }
 
@@ -330,8 +392,15 @@ function handleBookmarks(event) {
   $modal.className = 'modal-overlay hidden';
   viewSwap('search-results');
   $searchResultTitle.textContent = 'Bookmarks';
+  data.nextResultId = 0;
 
   var $liList = document.querySelectorAll('li');
+
+  if (data.bookmarks.length === 0) {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
+  } else {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
+  }
 
   for (var i = 0; i < $liList.length; i++) {
     $liList[i].remove();
@@ -339,6 +408,7 @@ function handleBookmarks(event) {
 
   for (var b = 0; b < data.bookmarks.length; b++) {
     var render = renderResults(data.bookmarks[b]);
+    data.nextResultId++;
     $ul.appendChild(render);
   }
 

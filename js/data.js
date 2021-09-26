@@ -4,6 +4,7 @@ var data = {
   bookmarks: [],
   results: [],
   detail: null,
+  detailId: 0,
   nextResultId: 0,
   view: '',
   searchPageView: ''
