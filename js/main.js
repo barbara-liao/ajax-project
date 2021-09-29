@@ -28,33 +28,31 @@ $detailPageContainer.addEventListener('click', handleAddAndRemove);
 
 function handleLoad(event) {
   viewSwap(data.view);
-  data.nextResultId = 0;
 
   if (data.searchPageView === 'Bookmarks') {
     for (var b = 0; b < data.bookmarks.length; b++) {
       var renderBookmarks = renderResults(data.bookmarks[b]);
-      data.nextResultId++;
       $ul.appendChild(renderBookmarks);
     }
     $searchResultTitle.textContent = 'Bookmarks';
   } else {
     for (var i = 0; i < data.results.length; i++) {
       var render = renderResults(data.results[i]);
-      console.log(data.results[i].id);
-      data.nextResultId++;
       $ul.appendChild(render);
     }
     $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
   }
 
-  if (data.bookmarks.length === 0) {
+  if (data.bookmarks.length === 0 && data.view !== 'search-results') {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
   } else {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
 
-  var renderPreviousDetail = renderDetail(data.detail);
-  $detailPageContainer.appendChild(renderPreviousDetail);
+  if (data.detail !== null) {
+    var renderPreviousDetail = renderDetail(data.detail);
+    $detailPageContainer.appendChild(renderPreviousDetail);
+  }
 }
 
 function handleSubmit(event) {
@@ -70,7 +68,6 @@ function handleSubmit(event) {
     $liList[d].remove();
   }
 
-  data.nextResultId = 0;
   data.results = [];
 
   for (var i = 0; i < $searchForm.elements.search.value.length; i++) {
@@ -94,11 +91,9 @@ function handleSubmit(event) {
   newSearch.responseType = 'json';
   newSearch.addEventListener('load', function () {
     for (var a = 0; a < this.response.items.length; a++) {
-      console.log(this.response.items[a].id);
       data.results.push(this.response.items[a]);
       var render = renderResults(this.response.items[a]);
       $ul.appendChild(render);
-      data.nextResultId++;
     }
   });
 
@@ -329,42 +324,56 @@ function handleDetail(event) {
   var $resultId = event.target.getAttribute('data-id');
 
   if (data.searchPageView === 'Bookmarks') {
-    var renderBookmarks = renderDetail(data.bookmarks[$resultId]);
-    $detailPageContainer.appendChild(renderBookmarks);
-    data.detail = data.bookmarks[$resultId];
-    data.detailId = $resultId;
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      if (data.bookmarks[b].id === $resultId) {
+        var renderBookmarks = renderDetail(data.bookmarks[b]);
+        $detailPageContainer.appendChild(renderBookmarks);
+        data.detail = data.bookmarks[b];
+      }
+    }
   } else {
-    var render = renderDetail(data.results[$resultId]);
-    $detailPageContainer.appendChild(render);
-    data.detail = data.results[$resultId];
-    data.detailId = $resultId;
+    for (var i = 0; i < data.results.length; i++) {
+      if (data.results[i].id === $resultId) {
+        var render = renderDetail(data.results[i]);
+        $detailPageContainer.appendChild(render);
+        data.detail = data.results[i];
+      }
+    }
   }
 }
 
 function handleAddAndRemove(event) {
-  if (event.target.nodeName === 'BUTTON' && event.target.textContent === 'Add to Bookmarks') {
-    console.log(event.target);
+  var $dataId = event.target.getAttribute('data-id');
+  var $iList = document.querySelectorAll('i');
+  if ((event.target.nodeName === 'BUTTON' && event.target.textContent === 'Add to Bookmarks') || event.target.className === 'fas fa-plus margin-zero') {
     $confirmMessage.textContent = 'Added to Bookmarks';
     $bookmarkButtonModal.textContent = 'Go to Bookmarks';
     $modal.className = 'modal-overlay';
-    data.bookmarks.push(data.results[parseInt(data.detailId)]);
-  } else if (event.target.nodeName === 'BUTTON' && event.target.textContent === 'Remove from Bookmarks') {
-    $modal.className = 'modal-overlay';
-    $confirmMessage.textContent = 'Remove from Bookmarks?';
-    $bookmarkButtonModal.textContent = 'Remove';
-  }
+    for (var b = 0; b < $iList.length; b++) {
+      if (data.view === 'detail-page' && $iList[b].getAttribute('data-id') === data.detail.id) {
+        $iList[b].className = 'fas fa-minus margin-zero';
+      }
+    }
+    if (event.target.className === 'fas fa-plus margin-zero') {
+      event.target.className = 'fas fa-minus margin-zero';
+    }
+    if (event.target.textContent === 'Add to Bookmarks') {
+      event.target.textContent = 'Remove from Bookmarks';
+    }
+    for (var i = 0; i < data.results.length; i++) {
+      if (data.results[i].id === $dataId || data.results[i].id === data.detail.id) {
+        data.bookmarks.push(data.results[i]);
+      }
+    }
+  } else if ((event.target.nodeName === 'BUTTON' && event.target.textContent === 'Remove from Bookmarks') || event.target.className === 'fas fa-minus margin-zero') {
+    // debugger;
+    for (var d = 0; d < $iList[d]; d++) {
+      // console.log($iList[d].getAttribute('data-id'));
+      if (data.view === 'detail-page' && $iList[d].getAttribute('data-id') === data.detail.id && $iList[d].className === 'fas fa-minus margin-zero') {
 
-  if (event.target.className === 'fas fa-plus margin-zero') {
-    console.log(event.target);
-    var $resultId = event.target.getAttribute('data-id');
-    $confirmMessage.textContent = 'Added to Bookmark';
-    $bookmarkButtonModal.textContent = 'Go to Bookmarks';
-    $modal.className = 'modal-overlay';
-    event.target.className = 'fas fa-minus margin-zero';
-    data.bookmarks.push(data.results[$resultId]);
-  } else if (event.target.className === 'fas fa-minus margin-zero') {
-    $resultId = event.target.getAttribute('data-id');
-    data.detailId = $resultId;
+        $iList[d].className = 'fas fa-plus margin-zero';
+      }
+    }
     $modal.className = 'modal-overlay';
     $confirmMessage.textContent = 'Remove from Bookmarks?';
     $bookmarkButtonModal.textContent = 'Remove';
@@ -372,20 +381,18 @@ function handleAddAndRemove(event) {
 }
 
 function confirmRemove(event) {
+  var $bookmarkButton = document.querySelector('.detail-bookmark-button');
   if (event.target.textContent === 'Remove') {
     for (var i = 0; i < data.bookmarks.length; i++) {
       if (data.bookmarks[i].id === data.detail.id) {
         data.bookmarks.splice(i, 1);
-      }
-    }
-    var $liList = document.querySelectorAll('li');
-    for (var a = 0; a < $liList.length; a++) {
-      if (parseInt($liList[a]).getAttribute('data-id') === data.detail.id) {
-        $liList[a].remove();
+        var $liList = document.querySelectorAll('li');
+        $liList[i].remove();
       }
     }
   }
   $modal.className = 'modal-overlay hidden';
+  $bookmarkButton.textContent = 'Add to Bookmarks';
 
   if (data.bookmarks.length === 0) {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
@@ -402,12 +409,24 @@ function closeModal(event) {
 }
 
 function handleBookmarks(event) {
-  $modal.className = 'modal-overlay hidden';
-  viewSwap('search-results');
-  $searchResultTitle.textContent = 'Bookmarks';
-  data.nextResultId = 0;
-
+  var $navButton = event.target.getAttribute('class');
   var $liList = document.querySelectorAll('li');
+  $modal.className = 'modal-overlay hidden';
+  if (event.target.textContent === 'Go to Bookmarks' || $navButton === 'fas fa-book-open') {
+    viewSwap('search-results');
+    $searchResultTitle.textContent = 'Bookmarks';
+
+    for (var i = 0; i < $liList.length; i++) {
+      $liList[i].remove();
+    }
+
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      var render = renderResults(data.bookmarks[b]);
+      $ul.appendChild(render);
+    }
+
+    data.searchPageView = 'Bookmarks';
+  }
 
   if (data.bookmarks.length === 0) {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
@@ -415,19 +434,6 @@ function handleBookmarks(event) {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
 
-  for (var i = 0; i < $liList.length; i++) {
-    $liList[i].remove();
-  }
-
-  for (var b = 0; b < data.bookmarks.length; b++) {
-    var render = renderResults(data.bookmarks[b]);
-    data.nextResultId++;
-    $ul.appendChild(render);
-  }
-
-  data.nextResultId = 0;
-  viewSwap('search-results');
-  data.searchPageView = 'Bookmarks';
 }
 
 function dataView(event) {
