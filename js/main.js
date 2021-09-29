@@ -42,12 +42,7 @@ function handleLoad(event) {
     }
     $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
   }
-
-  if (data.bookmarks.length === 0 && data.view !== 'search-results') {
-    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
-  } else {
-    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
-  }
+  noBookmarksMessage();
 
   if (data.detail !== null) {
     var renderPreviousDetail = renderDetail(data.detail);
@@ -366,17 +361,10 @@ function handleAddAndRemove(event) {
       }
     }
   } else if ((event.target.nodeName === 'BUTTON' && event.target.textContent === 'Remove from Bookmarks') || event.target.className === 'fas fa-minus margin-zero') {
-    // debugger;
-    for (var d = 0; d < $iList[d]; d++) {
-      // console.log($iList[d].getAttribute('data-id'));
-      if (data.view === 'detail-page' && $iList[d].getAttribute('data-id') === data.detail.id && $iList[d].className === 'fas fa-minus margin-zero') {
-
-        $iList[d].className = 'fas fa-plus margin-zero';
-      }
-    }
     $modal.className = 'modal-overlay';
     $confirmMessage.textContent = 'Remove from Bookmarks?';
     $bookmarkButtonModal.textContent = 'Remove';
+    data.removeId = $dataId;
   }
 }
 
@@ -390,15 +378,18 @@ function confirmRemove(event) {
         $liList[i].remove();
       }
     }
+    var $iList = document.querySelectorAll('i');
+    for (var d = 0; d < $iList.length; d++) {
+      if (data.view === 'detail-page' && $iList[d].getAttribute('data-id') === data.detail.id && $iList[d].className === 'fas fa-minus margin-zero') {
+        $iList[d].className = 'fas fa-plus margin-zero';
+      } else if (data.view === 'search-results' && $iList[d].getAttribute('data-id') === data.removeId) {
+        $iList[d].className = 'fas fa-plus margin-zero';
+      }
+    }
   }
   $modal.className = 'modal-overlay hidden';
   $bookmarkButton.textContent = 'Add to Bookmarks';
-
-  if (data.bookmarks.length === 0) {
-    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
-  } else {
-    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
-  }
+  noBookmarksMessage();
 }
 
 function closeModal(event) {
@@ -427,13 +418,15 @@ function handleBookmarks(event) {
 
     data.searchPageView = 'Bookmarks';
   }
+  noBookmarksMessage();
+}
 
-  if (data.bookmarks.length === 0) {
+function noBookmarksMessage() {
+  if (data.bookmarks.length === 0 && $searchResultTitle.textContent === 'Bookmarks') {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
   } else {
     $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
-
 }
 
 function dataView(event) {
