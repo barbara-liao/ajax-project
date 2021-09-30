@@ -1,3 +1,3 @@
 # ajax-project
 
-A dynamic HTML, CSS, and JavaScript solo project.
+A web application for book readers who want to view, bookmark and view the book's details.
