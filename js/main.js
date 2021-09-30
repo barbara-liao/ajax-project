@@ -10,17 +10,21 @@ var $modal = document.querySelector('.modal-overlay');
 var $closeModal = document.querySelector('#close-modal');
 var $bookmarkButtonNav = document.querySelector('#nav-bookmarks');
 var $bookmarkButtonModal = document.querySelector('.go-to-bookmark');
+var $confirmMessage = document.querySelector('.confirm-message');
+var $bookmarkMessage = document.querySelector('.bookmark-message');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
 $navSearchButton.addEventListener('click', dataView);
 window.addEventListener('DOMContentLoaded', handleLoad);
 $ul.addEventListener('click', handleDetail);
-$ul.addEventListener('click', handleAdd);
+$ul.addEventListener('click', handleAddAndRemove);
 $back.addEventListener('click', dataView);
 $closeModal.addEventListener('click', closeModal);
 $bookmarkButtonNav.addEventListener('click', handleBookmarks);
 $bookmarkButtonModal.addEventListener('click', handleBookmarks);
+$bookmarkButtonModal.addEventListener('click', confirmRemove);
+$detailPageContainer.addEventListener('click', handleAddAndRemove);
 
 function handleLoad(event) {
   viewSwap(data.view);
@@ -38,9 +42,12 @@ function handleLoad(event) {
     }
     $searchResultTitle.textContent = 'Search Results for ' + '"' + data.search + '"';
   }
+  noBookmarksMessage();
 
-  var renderPreviousDetail = renderDetail(data.detail);
-  $detailPageContainer.appendChild(renderPreviousDetail);
+  if (data.detail !== null) {
+    var renderPreviousDetail = renderDetail(data.detail);
+    $detailPageContainer.appendChild(renderPreviousDetail);
+  }
 }
 
 function handleSubmit(event) {
@@ -48,13 +55,14 @@ function handleSubmit(event) {
   var keywords = [];
   var tempOutput = '';
 
+  $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
+
   var $liList = document.querySelectorAll('li');
 
   for (var d = 0; d < $liList.length; d++) {
     $liList[d].remove();
   }
 
-  data.nextResultId = 0;
   data.results = [];
 
   for (var i = 0; i < $searchForm.elements.search.value.length; i++) {
@@ -81,7 +89,6 @@ function handleSubmit(event) {
       data.results.push(this.response.items[a]);
       var render = renderResults(this.response.items[a]);
       $ul.appendChild(render);
-      data.nextResultId++;
     }
   });
 
@@ -95,7 +102,7 @@ function handleSubmit(event) {
 
 function renderResults(result) {
   var $li = document.createElement('li');
-  $li.setAttribute('result-id', data.nextResultId);
+  $li.setAttribute('data-id', result.id);
 
   var $card = document.createElement('div');
   $li.appendChild($card);
@@ -140,8 +147,7 @@ function renderResults(result) {
       }
     }
   }
-  $plus.classList.add('add-to-bookmarks');
-  $plus.setAttribute('result-id', data.nextResultId);
+  $plus.setAttribute('data-id', result.id);
 
   var $rowTitle = document.createElement('div');
   $colTwoThird.appendChild($rowTitle);
@@ -175,7 +181,7 @@ function renderResults(result) {
   $detailButton.className = 'detail-button';
   $detailButton.setAttribute('data-view', 'detail-page');
   $detailButton.setAttribute('id', 'details');
-  $detailButton.setAttribute('result-id', data.nextResultId);
+  $detailButton.setAttribute('data-id', result.id);
 
   return $li;
 }
@@ -274,8 +280,19 @@ function renderDetail(result) {
 
   var $button = document.createElement('button');
   $buttonRow.appendChild($button);
-  $button.className = 'bookmark-button';
-  $button.textContent = 'Remove from Bookmarks';
+  $button.className = 'detail-bookmark-button';
+  if (data.bookmarks.length === 0) {
+    $button.textContent = 'Add to Bookmarks';
+  } else {
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      if (result.id === data.bookmarks[b].id) {
+        $button.textContent = 'Remove from Bookmarks';
+        break;
+      } else {
+        $button.textContent = 'Add to Bookmarks';
+      }
+    }
+  }
 
   var $summaryRow = document.createElement('div');
   $detailPageRender.appendChild($summaryRow);
@@ -290,33 +307,89 @@ function renderDetail(result) {
 
 function handleDetail(event) {
   var $dataView = event.target.getAttribute('data-view');
+
   if (event.target.nodeName === 'BUTTON' && $dataView !== '') {
     var $previousRender = document.querySelectorAll('#detail-page-render');
-
     for (var d = 0; d < $previousRender.length; d++) {
       $previousRender[d].remove();
     }
     viewSwap($dataView);
   }
 
-  var $resultId = event.target.getAttribute('result-id');
+  var $resultId = event.target.getAttribute('data-id');
 
-  var render = renderDetail(data.results[$resultId]);
-  $detailPageContainer.appendChild(render);
-  data.detail = data.results[$resultId];
-
+  if (data.searchPageView === 'Bookmarks') {
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      if (data.bookmarks[b].id === $resultId) {
+        var renderBookmarks = renderDetail(data.bookmarks[b]);
+        $detailPageContainer.appendChild(renderBookmarks);
+        data.detail = data.bookmarks[b];
+      }
+    }
+  } else {
+    for (var i = 0; i < data.results.length; i++) {
+      if (data.results[i].id === $resultId) {
+        var render = renderDetail(data.results[i]);
+        $detailPageContainer.appendChild(render);
+        data.detail = data.results[i];
+      }
+    }
+  }
 }
 
-function handleAdd(event) {
-  var $class = event.target.getAttribute('class');
-  if (event.target.className === 'fas fa-plus margin-zero add-to-bookmarks' && $class.includes('add-to-bookmarks')) {
-    var $resultId = event.target.getAttribute('result-id');
-
+function handleAddAndRemove(event) {
+  var $dataId = event.target.getAttribute('data-id');
+  var $iList = document.querySelectorAll('i');
+  if ((event.target.nodeName === 'BUTTON' && event.target.textContent === 'Add to Bookmarks') || event.target.className === 'fas fa-plus margin-zero') {
+    $confirmMessage.textContent = 'Added to Bookmarks';
+    $bookmarkButtonModal.textContent = 'Go to Bookmarks';
     $modal.className = 'modal-overlay';
-    event.target.className = 'fas fa-minus margin-zero';
-
-    data.bookmarks.push(data.results[$resultId]);
+    for (var b = 0; b < $iList.length; b++) {
+      if (data.view === 'detail-page' && $iList[b].getAttribute('data-id') === data.detail.id) {
+        $iList[b].className = 'fas fa-minus margin-zero';
+      }
+    }
+    if (event.target.className === 'fas fa-plus margin-zero') {
+      event.target.className = 'fas fa-minus margin-zero';
+    }
+    if (event.target.textContent === 'Add to Bookmarks') {
+      event.target.textContent = 'Remove from Bookmarks';
+    }
+    for (var i = 0; i < data.results.length; i++) {
+      if (data.results[i].id === $dataId || data.results[i].id === data.detail.id) {
+        data.bookmarks.push(data.results[i]);
+      }
+    }
+  } else if ((event.target.nodeName === 'BUTTON' && event.target.textContent === 'Remove from Bookmarks') || event.target.className === 'fas fa-minus margin-zero') {
+    $modal.className = 'modal-overlay';
+    $confirmMessage.textContent = 'Remove from Bookmarks?';
+    $bookmarkButtonModal.textContent = 'Remove';
+    data.removeId = $dataId;
   }
+}
+
+function confirmRemove(event) {
+  var $bookmarkButton = document.querySelector('.detail-bookmark-button');
+  if (event.target.textContent === 'Remove') {
+    for (var i = 0; i < data.bookmarks.length; i++) {
+      if (data.bookmarks[i].id === data.detail.id) {
+        data.bookmarks.splice(i, 1);
+        var $liList = document.querySelectorAll('li');
+        $liList[i].remove();
+      }
+    }
+    var $iList = document.querySelectorAll('i');
+    for (var d = 0; d < $iList.length; d++) {
+      if (data.view === 'detail-page' && $iList[d].getAttribute('data-id') === data.detail.id && $iList[d].className === 'fas fa-minus margin-zero') {
+        $iList[d].className = 'fas fa-plus margin-zero';
+      } else if (data.view === 'search-results' && $iList[d].getAttribute('data-id') === data.removeId) {
+        $iList[d].className = 'fas fa-plus margin-zero';
+      }
+    }
+  }
+  $modal.className = 'modal-overlay hidden';
+  $bookmarkButton.textContent = 'Add to Bookmarks';
+  noBookmarksMessage();
 }
 
 function closeModal(event) {
@@ -327,24 +400,33 @@ function closeModal(event) {
 }
 
 function handleBookmarks(event) {
-  $modal.className = 'modal-overlay hidden';
-  viewSwap('search-results');
-  $searchResultTitle.textContent = 'Bookmarks';
-
+  var $navButton = event.target.getAttribute('class');
   var $liList = document.querySelectorAll('li');
+  $modal.className = 'modal-overlay hidden';
+  if (event.target.textContent === 'Go to Bookmarks' || $navButton === 'fas fa-book-open') {
+    viewSwap('search-results');
+    $searchResultTitle.textContent = 'Bookmarks';
 
-  for (var i = 0; i < $liList.length; i++) {
-    $liList[i].remove();
+    for (var i = 0; i < $liList.length; i++) {
+      $liList[i].remove();
+    }
+
+    for (var b = 0; b < data.bookmarks.length; b++) {
+      var render = renderResults(data.bookmarks[b]);
+      $ul.appendChild(render);
+    }
+
+    data.searchPageView = 'Bookmarks';
   }
+  noBookmarksMessage();
+}
 
-  for (var b = 0; b < data.bookmarks.length; b++) {
-    var render = renderResults(data.bookmarks[b]);
-    $ul.appendChild(render);
+function noBookmarksMessage() {
+  if (data.bookmarks.length === 0 && $searchResultTitle.textContent === 'Bookmarks') {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message';
+  } else {
+    $bookmarkMessage.className = 'row justify-center align-center bookmark-message hidden';
   }
-
-  data.nextResultId = 0;
-  viewSwap('search-results');
-  data.searchPageView = 'Bookmarks';
 }
 
 function dataView(event) {
