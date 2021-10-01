@@ -1,8 +1,9 @@
 .header {
-  font-family: 'Shadows Into Light', cursive;
-  font-size: 3rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
   color: white;
   margin: 5px 0;
+  letter-spacing: -0.05rem;
 }
 
 .hidden {
@@ -11,11 +12,13 @@
 
 .header-container {
   background-color: #829f7a;
+  height: 3rem;
 }
 
 .fixed-container {
   max-width: 900px;
   margin: 0 auto;
+  height: 100%;
 }
 
 body {
@@ -85,6 +88,7 @@ body {
 .header-margin-padding {
   margin: 0 auto;
   padding: 0 15px;
+  height: 100%;
 }
 
 .close-modal {
@@ -113,19 +117,19 @@ body {
 .nav-button {
   background-color: #829f7a;
   border: none;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: white;
+  padding: 1px 3px;
 }
 
 .search-img {
-  width: 90%;
+  width: 70%;
   position: relative;
 }
 
 .search-bar-container {
   position: absolute;
-
-  /* top: 20%; */
+  top: 22rem;
   width: 350px;
 }
 
@@ -135,6 +139,16 @@ body {
   font-size: 1.5rem;
   padding: 0 8px;
   border-right: none;
+}
+
+.line {
+  border: none;
+  border-top: lightgray solid 1.5px;
+  width: 100%;
+  color: gray;
+  height: 3px;
+  text-align: center;
+  margin: 1.5rem auto 0.8rem auto;
 }
 
 .results-margin {
@@ -176,7 +190,8 @@ body {
   display: flex;
 }
 
-.image-width {
+.image-width,
+.image-width-detail {
   width: 50%;
   height: 90%;
 }
@@ -298,9 +313,9 @@ button:hover {
   color: #d1d1d1;
 }
 
-@media screen and (max-width: 768px) {
-  .container {
-    max-width: 900px;
+@media screen and (max-width: 576px) {
+  .card {
+    height: 200px;
   }
 
   .search-bar {
@@ -308,8 +323,46 @@ button:hover {
     font-size: 1.2rem;
   }
 
+  .search-img {
+    width: 100%;
+  }
+
+  .search-bar-container {
+    top: 15.5rem;
+    width: 350px;
+  }
+
+  .header {
+    font-size: 1.2rem;
+  }
+
   .image-width {
     width: 100%;
-    height: 100%;
+    border-radius: 5px 0 0 5px;
+    height: 198px;
+  }
+
+  .image-width-detail {
+    width: 100%;
+    height: 198px;
+  }
+
+  .modal {
+    height: 250px;
+    width: 350px;
+  }
+
+  .column-height {
+    height: 200px;
+  }
+
+  .column-two-thirds {
+    flex-basis: calc(200% / 3);
+    padding: 10px 10px 10px 13px;
+  }
+
+  .line {
+    width: 90%;
+    text-align: center;
   }
 }
