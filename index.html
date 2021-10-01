@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AJAX Project</title>
+  <title>Bookopedia</title>
   <link rel="icon" href="images/favicon.ico">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/styles.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon-book.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500&family=Open+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="header-container">
@@ -43,7 +44,7 @@
       <form id="search-form">
         <div class="column-half margin-auto">
           <div class="row align-center justify-center search-margin">
-            <img class="search-img" src="images/AJAX-Background.svg">
+            <img class="search-img" src="images/search-background.svg">
             <div class="search-bar-container flex justify-center">
               <input required class="search-bar" name="search" type="text" placeholder="Search for title or author">
               <button data-view="search-results" id="search-button" class="flex align-center search-icon" type="submit"><i data-view="search-results" class="fas fa-search"></i></button>
@@ -68,7 +69,7 @@
       <div class="row back-margin">
         <button data-view="search-results" id="back-to-results" class="flex back-button align-center padding-zero">
           <i data-view="search-results" class="margin-side fas fa-chevron-left"></i>
-          <p data-view="search-results" class="margin-zero">Back to Results</p>
+          <p data-view="search-results" class="margin-zero">Back</p>
         </button>
       </div>
     </div>

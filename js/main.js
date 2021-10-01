@@ -27,7 +27,11 @@ $bookmarkButtonModal.addEventListener('click', confirmRemove);
 $detailPageContainer.addEventListener('click', handleAddAndRemove);
 
 function handleLoad(event) {
-  viewSwap(data.view);
+  if (data.view === '') {
+    viewSwap('search-page');
+  } else {
+    viewSwap(data.view);
+  }
 
   if (data.searchPageView === 'Bookmarks') {
     for (var b = 0; b < data.bookmarks.length; b++) {
@@ -208,7 +212,7 @@ function renderDetail(result) {
 
   var $image = document.createElement('img');
   $colOneThird.appendChild($image);
-  $image.className = 'image-width';
+  $image.className = 'image-width-detail';
   if ('imageLinks' in result.volumeInfo) {
     $image.setAttribute('src', result.volumeInfo.imageLinks.thumbnail);
   } else {
@@ -251,13 +255,13 @@ function renderDetail(result) {
   $starReviewBookmarkRow.appendChild($ratings);
   $ratings.className = 'row star-size';
 
-  for (var r = 0; r < result.volumeInfo.averageRating; r++) {
+  for (var r = 0; r < Math.floor(result.volumeInfo.averageRating); r++) {
     var $filledStar = document.createElement('i');
     $filledStar.className = 'margin-zero fas fa-star';
     $ratings.appendChild($filledStar);
   }
 
-  for (var f = 0; f < 5 - result.volumeInfo.averageRating; f++) {
+  for (var f = 0; f < 5 - Math.floor(result.volumeInfo.averageRating); f++) {
     var $emptyStar = document.createElement('i');
     $emptyStar.className = 'margin-zero far fa-star';
     $ratings.appendChild($emptyStar);
@@ -293,6 +297,10 @@ function renderDetail(result) {
       }
     }
   }
+
+  var $horizontalLine = document.createElement('hr');
+  $detailPageRender.appendChild($horizontalLine);
+  $horizontalLine.className = 'line';
 
   var $summaryRow = document.createElement('div');
   $detailPageRender.appendChild($summaryRow);
