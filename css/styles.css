@@ -314,10 +314,6 @@ button:hover {
 }
 
 @media screen and (max-width: 576px) {
-  .container {
-    max-width: 900px;
-  }
-
   .card {
     height: 200px;
   }
