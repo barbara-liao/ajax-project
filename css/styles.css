@@ -123,13 +123,12 @@ body {
 }
 
 .search-img {
-  width: 70%;
+  min-width: 100%;
   position: relative;
 }
 
 .search-bar-container {
   position: absolute;
-  top: 22rem;
   width: 350px;
 }
 
@@ -163,8 +162,9 @@ body {
   margin: 0 0 10px 0;
 }
 
-.search-margin {
-  margin: 3rem 3rem 0 3rem;
+.search-container {
+  width: 80%;
+  margin: 3rem auto 0;
 }
 
 .search-icon {
@@ -328,7 +328,6 @@ button:hover {
   }
 
   .search-bar-container {
-    top: 15.5rem;
     width: 350px;
   }
 

@@ -84,7 +84,7 @@ function handleSubmit(event) {
     urlSearch += '+' + keywords[k];
   }
 
-  urlSearch += '&key=AIzaSyAprbajqaJzqpx5B2mWefJBeXh5zfnaX9g';
+  urlSearch += '&key=AIzaSyBjkEweaUC43xQh7FC2aazTwBLoAaPSiHY';
   var newSearch = new XMLHttpRequest();
   newSearch.open('GET', urlSearch);
   newSearch.responseType = 'json';
