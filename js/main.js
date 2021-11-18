@@ -12,6 +12,7 @@ var $bookmarkButtonNav = document.querySelector('#nav-bookmarks');
 var $bookmarkButtonModal = document.querySelector('.go-to-bookmark');
 var $confirmMessage = document.querySelector('.confirm-message');
 var $bookmarkMessage = document.querySelector('.bookmark-message');
+var $results = document.querySelector('.results-margin');
 
 $searchForm.addEventListener('submit', handleSubmit);
 $searchButton.addEventListener('click', dataView);
@@ -86,20 +87,32 @@ function handleSubmit(event) {
 
   urlSearch += '&key=AIzaSyBjkEweaUC43xQh7FC2aazTwBLoAaPSiHY';
   var newSearch = new XMLHttpRequest();
+
+  newSearch.addEventListener('loadstart', showLoad);
+
   newSearch.open('GET', urlSearch);
   newSearch.responseType = 'json';
   newSearch.addEventListener('load', function () {
-    for (var a = 0; a < this.response.items.length; a++) {
-      data.results.push(this.response.items[a]);
-      var render = renderResults(this.response.items[a]);
-      $ul.appendChild(render);
+    if (!this.response.items) {
+      handleNoResults();
+    } else if (this.response.items) {
+      for (var a = 0; a < this.response.items.length; a++) {
+        data.results.push(this.response.items[a]);
+        var render = renderResults(this.response.items[a]);
+        $ul.appendChild(render);
+      }
+    } else {
+      handleNetworkErrors();
     }
+    var $spinner = document.querySelector('.spinner-container');
+    $results.removeChild($spinner);
   });
 
   $searchResultTitle.textContent = 'Search Results for ' + '"' + $searchForm.elements.search.value + '"';
   data.search = $searchForm.elements.search.value;
 
   data.searchPageView = 'Search Results';
+
   $searchForm.reset();
   newSearch.send();
 }
@@ -311,6 +324,78 @@ function renderDetail(result) {
   $summary.textContent = result.volumeInfo.description;
 
   return $detailPageRender;
+}
+
+function showLoad(event) {
+  var $loadContainer = document.createElement('div');
+  $loadContainer.className = 'flex spinner-container justify-center align-center';
+  $results.appendChild($loadContainer);
+
+  var $loader = document.createElement('div');
+  $loadContainer.appendChild($loader);
+  $loader.className = 'lds-default';
+
+  var $child1 = document.createElement('div');
+  $loader.appendChild($child1);
+
+  var $child2 = document.createElement('div');
+  $loader.appendChild($child2);
+
+  var $child3 = document.createElement('div');
+  $loader.appendChild($child3);
+
+  var $child4 = document.createElement('div');
+  $loader.appendChild($child4);
+
+  var $child5 = document.createElement('div');
+  $loader.appendChild($child5);
+
+  var $child6 = document.createElement('div');
+  $loader.appendChild($child6);
+
+  var $child7 = document.createElement('div');
+  $loader.appendChild($child7);
+
+  var $child8 = document.createElement('div');
+  $loader.appendChild($child8);
+
+  var $child9 = document.createElement('div');
+  $loader.appendChild($child9);
+
+  var $child10 = document.createElement('div');
+  $loader.appendChild($child10);
+
+  var $child11 = document.createElement('div');
+  $loader.appendChild($child11);
+
+  var $child12 = document.createElement('div');
+  $loader.appendChild($child12);
+
+  return $loadContainer;
+}
+
+function handleNoResults(event) {
+  var $noResults = document.createElement('div');
+  $noResults.className = 'no-results';
+  $results.appendChild($noResults);
+
+  var $noResultsText = document.createElement('h3');
+  $noResults.appendChild($noResultsText);
+  $noResultsText.textContent = 'No results were found.';
+
+  return $noResults;
+}
+
+function handleNetworkErrors(event) {
+  var $error = document.createElement('div');
+  $error.className = 'no-results';
+  $results.appendChild($error);
+
+  var $errorText = document.createElement('h3');
+  $error.appendChild($errorText);
+  $errorText.textContent = 'Something went wrong connecting to the network. Please try again later!';
+
+  return $error;
 }
 
 function handleDetail(event) {
