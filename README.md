@@ -1,8 +1,3 @@
-# ajax-project
-
-A web application for book readers who want to view, bookmark and view the book's details.
-
-
 # Bookopedia
 
 A full stack JavaScript application for book enthusiasts who want to look up books.
