@@ -1,8 +1,8 @@
-#ajax-project
+# ajax-project
 
 A web application for book readers who want to view, bookmark and view the book's details.
 
-```md
+
 # Bookopedia
 
 A full stack JavaScript application for book enthusiasts who want to look up books.
@@ -48,4 +48,3 @@ Try the application live at [barbara-liao.github.io/bookopedia/](barbara-liao.gi
 
 1. Open the project. Once opened, you can view the application by opening the index.html file in your browser.
 
-```
