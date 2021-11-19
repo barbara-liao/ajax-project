@@ -16,7 +16,7 @@ Try the application live at [barbara-liao.github.io/bookopedia/](barbara-liao.gi
 
 ## Features
 
-- Users can search for a book.
+- Users can search for a book or author.
 - Users can view the search results.
 - Users can view the details of the books.
 - Users can add books to their bookmark list.
