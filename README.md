@@ -31,6 +31,10 @@ Try the application live at [barbara-liao.github.io/bookopedia/](barbara-liao.gi
 ## Preview
 ![bookopedia-demo](https://user-images.githubusercontent.com/87685216/142690542-81b9683c-f013-40ea-ba44-2ec7e41fb877.gif)
 
+## Stretch Features
+
+- Users can view more results.
+
 ### Getting Started
 
 1. Clone the repository.
