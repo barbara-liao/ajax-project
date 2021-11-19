@@ -85,7 +85,7 @@ function handleSubmit(event) {
     urlSearch += '+' + keywords[k];
   }
 
-  urlSearch += '&key=AIzaSyBjkEweaUC43xQh7FC2aazTwBLoAaPSiHY';
+  urlSearch += '&key=AIzaSyAprbajqaJzqpx5B2mWefJBeXh5zfnaX9g';
   var newSearch = new XMLHttpRequest();
 
   newSearch.addEventListener('loadstart', showLoad);
